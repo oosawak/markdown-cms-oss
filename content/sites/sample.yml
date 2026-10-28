@@ -1,0 +1,18 @@
+id: sample
+name: markdownCMSサンプルサイト
+short_name: markdownCMSサンプルサイト
+kind: website
+kind_label: サンプル
+accent: '#637f37'
+eyebrow: MARKDOWN CMS SAMPLE
+hero_title: "Markdownで書いて、\nそのまま公開。"
+description: Markdown CMSのサンプルサイトです。記事の書き方とサイトの作りを確認できます。
+subtitle: Markdown CMS テンプレートの見本
+hero_note: サンプル
+about: このサイトは Markdown CMS のサンプルです。表示されている文章と画像は、使い方を確認するための見本です。
+hero_image: sample/hero.webp
+
+# 配布ソースは固定表示。公開デモだけActionsで切り替えを有効にします。
+theme_switcher: false
+# UIが無効な場合の固定デザイン。UIが有効な場合は初回表示のデザイン。
+template: natural

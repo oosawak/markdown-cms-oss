@@ -1,0 +1,38 @@
+/* DESIGN.md-based page templates. Shared data helpers keep content independent of layout. */
+window.MarkdownCMSTemplates=({h,loc,tr,date,routeLink,filters,tile})=>{
+  const aboutLink=()=>`<a class="tpl-link" href="${h(routeLink('about/sample'))}">${h(tr('about'))} ↗</a>`;
+  const homeLink=()=>`<a class="tpl-link" href="${h(routeLink('sample'))}">← ${h(tr('back'))}</a>`;
+  const image=(src,alt='',classes='')=>`<img class="${classes}" src="${h(src)}" alt="${h(alt)}">`;
+  const heading=s=>`<span class="tpl-eyebrow">${h(s.eyebrow)}</span><h1>${h(s.hero_title)}</h1><p class="tpl-description">${h(s.description)}</p>`;
+  const postLink=it=>routeLink(`post/sample/${it.slug}`);
+  const meta=it=>`<span class="tpl-eyebrow">${date(it.date)} / ${h(it.category)}</span>`;
+  const articleText=it=>`<div class="prose">${it.html}</div>`;
+  const cards=entries=>`<div class="grid" data-grid>${entries.map(tile).join('')}</div><p class="empty" data-empty hidden>${h(tr('noMatches'))}</p>`;
+  const flightBoard=text=>`<span class="tpl-board" role="img" aria-label="${h(text)}">${text.split(' ').map(word=>`<span class="tpl-board-word" aria-hidden="true">${[...word].map(letter=>`<span class="tpl-board-letter" data-letter="${h(letter)}">${h(letter)}</span>`).join('')}</span>`).join('')}</span>`;
+  const flightMeta=it=>`<div class="tpl-flight-meta"><span><small>PUBLISHED</small><time datetime="${h(it.date)}">${h(it.date)}</time></span><span><small>CATEGORY</small>${h(it.category)}</span></div>`;
+  function rows(entries,numbered=false){return `<div class="tpl-rows" data-grid>${entries.map((raw,index)=>{const it=loc(raw);return `<article class="tpl-row" data-card data-site="sample" data-category="${h(it.category)}">${numbered?`<span class="tpl-number">${String(index+1).padStart(2,'0')}</span>`:''}<div>${numbered?flightMeta(it):meta(it)}<h3><a href="${h(postLink(it))}">${h(it.title)}</a></h3><p>${h(it.summary)}</p><a class="tpl-link" href="${h(postLink(it))}">${h(tr('read'))}</a></div><a href="${h(postLink(it))}">${image(it.cover.src,it.cover.alt)}</a></article>`}).join('')}</div><p class="empty" data-empty hidden>${h(tr('noMatches'))}</p>`}
+  const page=(id,kind,body)=>`<main class="tpl tpl-${id} tpl-${kind}" data-template="${id}" data-page="${kind}">${body}</main>`;
+  const aboutText=s=>`<p class="tpl-description">${h(s.description)}</p><p>${h(s.about)}</p>`;
+  return {
+    apple:{
+      home(data){const s=loc(data.site);return page('apple','home',`<section class="tpl-gallery-hero container"><div>${heading(s)}${aboutLink()}</div>${image(data.site.hero_image_src,'','tpl-gallery-photo')}</section><section class="section container"><div class="tpl-section-heading"><h2>${h(tr('news'))}</h2><span>${data.entries.length} ${h(tr('items'))}</span></div>${filters(data.entries,'site')}${cards(data.entries)}</section>`)},
+      detail(raw){const it=loc(raw);return page('apple','detail',`<header class="tpl-gallery-title container">${homeLink()}${meta(it)}<h1>${h(it.title)}</h1><p>${h(it.summary)}</p></header><div class="container">${image(raw.cover.src,raw.cover.alt,'tpl-wide-cover')}</div><article class="tpl-reading">${articleText(it)}${homeLink()}</article>`)},
+      about(data){const s=loc(data.site);return page('apple','about',`<section class="tpl-gallery-hero container"><div><span class="tpl-eyebrow">ABOUT</span><h1>${h(s.name)}</h1>${aboutText(s)}${homeLink()}</div>${image(data.site.hero_image_src,'','tpl-gallery-photo')}</section>`)},
+    },
+    notion:{
+      home(data){const s=loc(data.site);return page('notion','home',`<div class="tpl-notebook container"><aside class="tpl-notebook-nav"><span class="tpl-notebook-mark" aria-hidden="true">M↓</span><strong>${h(s.short_name)}</strong><p>${h(s.subtitle)}</p>${aboutLink()}</aside><div><header class="tpl-notebook-title">${heading(s)}<span class="tpl-note-label">${h(s.hero_note)}</span></header><section><h2>${h(tr('news'))}</h2>${filters(data.entries,'site')}${cards(data.entries)}</section></div></div>`)},
+      detail(raw,data){const it=loc(raw),s=loc(data.site);return page('notion','detail',`<div class="tpl-notebook container"><aside class="tpl-notebook-nav">${homeLink()}<strong>${h(s.short_name)}</strong>${meta(it)}${aboutLink()}</aside><article><header class="tpl-notebook-title"><span class="tpl-note-label">${h(it.category)}</span><h1>${h(it.title)}</h1><p>${h(it.summary)}</p></header>${image(raw.cover.src,raw.cover.alt,'tpl-wide-cover')}${articleText(it)}${homeLink()}</article></div>`)},
+      about(data){const s=loc(data.site);return page('notion','about',`<div class="tpl-notebook container"><aside class="tpl-notebook-nav">${homeLink()}<span class="tpl-notebook-mark" aria-hidden="true">M↓</span></aside><article class="tpl-notebook-title"><span class="tpl-note-label">ABOUT</span><h1>${h(s.name)}</h1>${aboutText(s)}</article></div>`)},
+    },
+    dala:{
+      home(data){const s=loc(data.site);return page('dala','home',`<header class="tpl-dark-stage container"><div>${heading(s)}${aboutLink()}</div><div class="tpl-orbit" aria-hidden="true"><span></span><span></span><span></span></div></header><section class="section container"><div class="tpl-section-heading"><h2>${h(tr('news'))}</h2><span>${data.entries.length} ${h(tr('items'))}</span></div>${filters(data.entries,'site')}${rows(data.entries)}</section>`)},
+      detail(raw){const it=loc(raw);return page('dala','detail',`<div class="tpl-dark-article container"><header>${homeLink()}${meta(it)}<h1>${h(it.title)}</h1><p class="tpl-description">${h(it.summary)}</p></header><article>${image(raw.cover.src,raw.cover.alt,'tpl-wide-cover')}${articleText(it)}${homeLink()}</article></div>`)},
+      about(data){const s=loc(data.site);return page('dala','about',`<section class="tpl-dark-article container"><header><span class="tpl-eyebrow">ABOUT</span><h1>${h(s.name)}</h1>${homeLink()}</header><article>${aboutText(s)}<div class="tpl-orbit" aria-hidden="true"><span></span><span></span><span></span></div></article></section>`)},
+    },
+    dope:{
+      home(data){const s=loc(data.site),latest=loc(data.entries[0]);return page('dope','home',`<section class="tpl-flight-hero container"><header>${heading(s)}${aboutLink()}</header>${latest?`<aside class="tpl-boarding"><span class="tpl-eyebrow">LATEST ENTRY / 01</span><span class="tpl-flight-rule">MARKDOWN → WEB</span><h2>${h(latest.title)}</h2><p>${h(latest.summary)}</p><a class="tpl-link" href="${h(postLink(latest))}">${h(tr('read'))}</a><div class="tpl-barcode" aria-hidden="true"></div></aside>`:''}</section><section class="section container"><div class="tpl-section-heading"><h2 class="tpl-board-heading">${flightBoard("NEWS JOURNAL")}</h2><span>${data.entries.length} ${h(tr('items'))}</span></div>${filters(data.entries,'site')}${rows(data.entries,true)}</section>`)},
+      detail(raw){const it=loc(raw);return page('dope','detail',`<header class="tpl-flight-title container">${homeLink()}${meta(it)}<h1>${h(it.title)}</h1><p class="tpl-description">${h(it.summary)}</p><div class="tpl-flight-rule">${flightBoard("JOURNAL")}</div></header><div class="container">${image(raw.cover.src,raw.cover.alt,'tpl-wide-cover')}</div><article class="tpl-reading">${articleText(it)}${homeLink()}</article>`)},
+      about(data){const s=loc(data.site);return page('dope','about',`<section class="tpl-flight-hero container"><header><span class="tpl-eyebrow">ABOUT / MARKDOWN CMS</span><h1>${h(s.name)}</h1>${homeLink()}</header><article class="tpl-boarding"><div class="tpl-flight-rule">WRITE → PUBLISH</div>${aboutText(s)}<div class="tpl-barcode" aria-hidden="true"></div></article></section>`)},
+    },
+  };
+};
