@@ -1,7 +1,7 @@
 {
   "id": "sample:how-to-write",
   "site_id": "sample",
-  "site_name": "markdownCMSサンプルサイト",
+  "site_name": "MarkdownCMS OSS版",
   "site_kind": "website",
   "slug": "how-to-write",
   "type": "article",

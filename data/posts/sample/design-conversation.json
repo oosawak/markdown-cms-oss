@@ -1,7 +1,7 @@
 {
   "id": "sample:design-conversation",
   "site_id": "sample",
-  "site_name": "markdownCMSサンプルサイト",
+  "site_name": "MarkdownCMS OSS版",
   "site_kind": "website",
   "slug": "design-conversation",
   "type": "article",

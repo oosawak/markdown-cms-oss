@@ -1,7 +1,7 @@
 {
   "id": "sample:change-design",
   "site_id": "sample",
-  "site_name": "markdownCMSサンプルサイト",
+  "site_name": "MarkdownCMS OSS版",
   "site_kind": "website",
   "slug": "change-design",
   "type": "article",
