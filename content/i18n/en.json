@@ -1,15 +1,15 @@
 {
   "sites": {
     "sample": {
-      "name": "markdownCMS Sample Site",
-      "short_name": "markdownCMS Sample Site",
+      "name": "MarkdownCMS OSS",
+      "short_name": "OSS",
       "kind_label": "Sample",
       "hero_title": "Write in Markdown.\nPublish as-is.",
-      "description": "A sample site for Markdown CMS. See how posts are written and how the site is put together.",
-      "subtitle": "A template demo for Markdown CMS",
-      "hero_note": "Sample",
-      "about": "This is a sample site for Markdown CMS. All text and images are examples to show how it works.",
-      "source_hash": "dcba21ae64a13b63897a5c445ff4c5d4fdf0cf22a8e01984d17465441b0037f4"
+      "description": "The MIT-licensed OSS edition, updated through GitHub and hosted on GitHub Pages.",
+      "subtitle": "OSS edition / GitHub updates",
+      "hero_note": "OSS · GitHub updates · GitHub Pages",
+      "about": "A sample of the OSS edition, generated with GitHub Actions and served by GitHub Pages.",
+      "source_hash": "7c4fff689a8b2c7b0de80050d99d8e4fd5a1519555d527868a925aa73af9c9ad"
     }
   },
   "posts": {}

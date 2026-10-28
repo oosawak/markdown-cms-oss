@@ -21,7 +21,7 @@ async function run(siteId='sample',saved='natural',settings={}){
   assert.match(sample.app.innerHTML,/data-theme-picker/);
   assert.match(sample.app.innerHTML,/Markdownで書いて/); // Sample home, not portal fallback.
   assert.doesNotMatch(sample.app.innerHTML,/統合ポータル|ONE TOWN, MANY STORIES/);
-  assert.equal(sample.document.title,'markdownCMSサンプルサイト');
+  assert.equal(sample.document.title,feed.site.name);
   assert.match(sample.app.innerHTML,/brandicon-sample/);
   for(const theme of ['apple','notion','dala','dope','natural']){
     sample.events.change({target:{matches:()=>true,value:theme}});
