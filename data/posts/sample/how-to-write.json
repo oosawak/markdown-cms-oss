@@ -7,6 +7,7 @@
   "type": "article",
   "title": "記事の書き方",
   "subtitle": "",
+  "author": "",
   "date": "2026-01-02",
   "category": "使い方",
   "summary": "Markdownファイルの先頭に付ける情報（タイトル・日付・カテゴリーなど）と、本文の書き方を説明します。",

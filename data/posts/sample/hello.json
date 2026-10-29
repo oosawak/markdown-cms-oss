@@ -7,6 +7,7 @@
   "type": "article",
   "title": "はじめまして、サンプルサイトです",
   "subtitle": "",
+  "author": "",
   "date": "2026-01-01",
   "category": "お知らせ",
   "summary": "Markdown CMSのサンプル記事です。この記事自体が、1本のMarkdownファイルから作られています。",
