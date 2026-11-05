@@ -74,12 +74,17 @@ def embed_src_prefix():
         return '/'.join(site_url.split('/')[:3])+'/'
     return ''
 
+EMBED_CLASSES=set()
+
 def expand_embeds(html_text):
     # A fenced ```embed block in the source (the URL on the first line, an
-    # optional WxH size on the second) becomes a responsive iframe. Raw HTML
-    # stays escaped by design, so this block is the only way to embed, and
-    # only URLs on the site's own origin are expanded; anything else is
-    # dropped. Without this feature the block simply renders as code.
+    # optional WxH size on the second, an optional width like 70% on the
+    # third) becomes a responsive iframe. Raw HTML stays escaped by design,
+    # so this block is the only way to embed, and only URLs on the site's
+    # own origin are expanded; anything else is dropped. Without this
+    # feature the block simply renders as code. Sizing goes through a
+    # generated CSS class (embed_style_rules), because the page CSP forbids
+    # inline styles.
     def repl(match):
         lines=[line.strip() for line in unescape(match.group(1)).splitlines() if line.strip()]
         if not lines:return ''
@@ -91,9 +96,22 @@ def expand_embeds(html_text):
             size=re.fullmatch(r'(\d+)x(\d+)',lines[1])
             if size and int(size.group(1))>0 and int(size.group(2))>0:
                 w,h=int(size.group(1)),int(size.group(2))
-        return (f'<iframe src="{escape(url,quote=True)}" loading="lazy" '
-                f'style="width:100%;aspect-ratio:{w} / {h};border:0;display:block" allowfullscreen></iframe>')
+        width_pct=100
+        if len(lines)>2:
+            pct=re.fullmatch(r'(\d+)%',lines[2])
+            if pct and 10<=int(pct.group(1))<=100:
+                width_pct=int(pct.group(1))
+        cls=f'embed-{w}-{h}-{width_pct}'
+        EMBED_CLASSES.add((cls,w,h,width_pct))
+        return (f'<iframe class="{cls}" src="{escape(url,quote=True)}" '
+                f'loading="lazy" allowfullscreen></iframe>')
     return re.sub(r'<pre><code class="language-embed">(.*?)</code></pre>',repl,html_text,flags=re.S)
+
+def embed_style_rules():
+    rules=['iframe[class^="embed-"]{border:0;display:block;margin:22px auto;background:#000;border-radius:10px}']
+    for cls,w,h,pct in sorted(EMBED_CLASSES):
+        rules.append(f'.{cls}{{width:{pct}%;aspect-ratio:{w} / {h}}}')
+    return '\n'.join(rules)+'\n'
 
 def sanitize_article_html(content):
     return expand_embeds(bleach.clean(content,tags=ALLOWED_MARKDOWN_TAGS,attributes=article_attribute,protocols=['http','https','mailto','data'],strip=True))
@@ -294,6 +312,9 @@ def generate():
     write_json(DIST/'data/portal.json',portal)
     write_json(DIST/'data/portal-local.json',portal)
     (DIST/'index.html').write_text(shell(),encoding='utf-8')
+    if EMBED_CLASSES:
+        with (DIST/'assets/style.css').open('a',encoding='utf-8') as css:
+            css.write(embed_style_rules())
     print(f'Built independent {SITE_ID}: {len(summaries)} items at {origin}')
 
 if __name__=='__main__':generate()
