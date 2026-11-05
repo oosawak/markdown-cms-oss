@@ -84,7 +84,9 @@ def expand_embeds(html_text):
     # own origin are expanded; anything else is dropped. Without this
     # feature the block simply renders as code. Sizing goes through a
     # generated CSS class (embed_style_rules), because the page CSP forbids
-    # inline styles.
+    # inline styles. The iframe carries a sandbox that still allows
+    # scripts and same-origin treatment, but blocks dialogs, popups, form
+    # submission and top navigation by the embedded page.
     def repl(match):
         lines=[line.strip() for line in unescape(match.group(1)).splitlines() if line.strip()]
         if not lines:return ''
@@ -104,6 +106,7 @@ def expand_embeds(html_text):
         cls=f'embed-{w}-{h}-{width_pct}'
         EMBED_CLASSES.add((cls,w,h,width_pct))
         return (f'<iframe class="{cls}" src="{escape(url,quote=True)}" '
+                f'sandbox="allow-scripts allow-same-origin" '
                 f'loading="lazy" allowfullscreen></iframe>')
     return re.sub(r'<pre><code class="language-embed">(.*?)</code></pre>',repl,html_text,flags=re.S)
 
