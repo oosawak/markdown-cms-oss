@@ -26,5 +26,5 @@ contact_form:
   enabled: true
   endpoint: https://microform.example.workers.dev/submit
   site_id: sample
-  sitekey: 1x00000000000000000000AA
+  sitekey: 0x4AAAAAAF-NLXBTZZUvCKR-
   privacy_url: ''
