@@ -1,0 +1,30 @@
+# microForm Worker の wrangler 設定サンプル。
+# このファイルを wrangler.toml にコピーして使う。
+# secret はここに書かず、wrangler secret put で設定する（README 参照）。
+
+name = "microform"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# サイト登録（宛先・許可 Origin など）。実運用の値はここか secret に置く。
+# to = 通知先メールアドレス（サーバー側でだけ決める。クライアントからは受けない）
+# from = 送信元メールアドレス
+#        email 方式: Email Routing を有効化したドメインのアドレスにする
+#        blastengine 方式: blastengine に登録した送信元
+# origins = フォームを置くサイトの Origin（スキーム＋ホスト＋ポート）
+# fields = 基本セット（名前/メール/件名/本文）への追加・上書き定義
+# MAIL_SENDER = メール送信方法。"email"（Email Routing、既定）か "blastengine"。
+[vars]
+MAIL_SENDER = "email"
+SITES = '{"sample": {"to": "owner@example.com", "from": "form@example.com", "origins": ["https://example.github.io"], "fields": {"company": {"type": "text", "required": false, "max": 100, "label": "会社名"}}}}'
+
+# MAIL_SENDER = "email" のときは send_email バインディングが要る。
+# 前提: 対象ドメインで Email Routing が有効化されていて、
+# 宛先アドレス（サイト登録の to）の検証が済んでいること。
+# [[send_email]]
+# name = "SEND_EMAIL"
+
+# 必要な secret（wrangler secret put <名前> で対話入力する）:
+#   TURNSTILE_SECRET      Cloudflare Turnstile のシークレットキー（常時）
+#   BLASTENGINE_LOGIN_ID  blastengine のログインID（MAIL_SENDER=blastengine のとき）
+#   BLASTENGINE_API_KEY   blastengine のAPIキー（MAIL_SENDER=blastengine のとき）
