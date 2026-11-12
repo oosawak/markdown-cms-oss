@@ -1,0 +1,54 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OSS版は自由に。開発を続けるCloudflare版もあります | MarkdownCMS OSS版</title>
+<meta name="description" content="MarkdownCMSのOSS版は、MITライセンスで自由に改変してご利用いただけます。開発を継続しているCloudflare版と、ご利用・導入のご相談先をご案内します。">
+<link rel="canonical" href="https://oosawak.github.io/markdown-cms-oss/posts/oss-and-cloudflare.html">
+<meta property="og:type" content="article"><meta property="og:site_name" content="MarkdownCMS OSS版">
+<meta property="og:title" content="OSS版は自由に。開発を続けるCloudflare版もあります">
+<meta property="og:description" content="MarkdownCMSのOSS版は、MITライセンスで自由に改変してご利用いただけます。開発を継続しているCloudflare版と、ご利用・導入のご相談先をご案内します。">
+<meta property="og:url" content="https://oosawak.github.io/markdown-cms-oss/posts/oss-and-cloudflare.html">
+<meta property="og:image" content="https://oosawak.github.io/markdown-cms-oss/og/oss-and-cloudflare.webp">
+<meta name="twitter:card" content="summary_large_image">
+<style>body{font-family:system-ui,-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;margin:0;background:#f8f7f1;color:#2b2620}main{max-width:760px;margin:0 auto;padding:20px 16px 48px}img.cover{width:100%;height:auto;border-radius:12px}h1{font-size:26px;line-height:1.4;margin:16px 0 6px}.meta{color:#8a7a63;font-size:13px}article{line-height:1.9;font-size:16px}article img{max-width:100%;height:auto}a{color:#8d5b2b}</style>
+</head><body><main>
+<p><a href="https://oosawak.github.io/markdown-cms-oss/">MarkdownCMS OSS版</a></p>
+<img class="cover" src="../og/oss-and-cloudflare.webp" alt="MarkdownCMSサンプルサイトの風景">
+<h1>OSS版は自由に。開発を続けるCloudflare版もあります</h1>
+<p class="meta">2026-10-29 ／ このサイトについて</p>
+<article><p>このサイトは、<strong>MarkdownCMSのOSS版</strong>のサンプルです。<br>
+Markdownで記事を書き、GitHubへpushすると、GitHub Actionsで公開用のデータを生成し、GitHub Pagesから配信します。</p>
+<h2>OSS版は、自由に改変してご利用ください</h2>
+<p>OSS版は、MITライセンスでソースコードを公開しています。<br>
+自分のサイトに合わせてデザインや機能を変えたり、個人のブログやお仕事のサイトに使ったり、自由に改変してご利用ください。</p>
+<p>ご利用・再配布の際は、同梱のLICENSEにある著作権表示とライセンス表示を残してください。依存ライブラリや第三者素材についても、それぞれの利用条件をご確認ください。</p>
+<ul>
+<li><a href="https://github.com/oosawak/markdown-cms-oss">OSS版のソースコードと使い方</a></li>
+<li><a href="https://github.com/oosawak/markdown-cms-oss/blob/main/LICENSE">MITライセンス</a></li>
+</ul>
+<p>OSS版は、現在公開しているものを一区切りとし、今後の機能開発はCloudflare版を中心に進めています。<br>
+OSS版をご自身で導入する場合は、設定や運用、必要な修正もご自身で行う形になります。</p>
+<h2>開発を継続しているCloudflare版</h2>
+<p>Cloudflare版は、商用版として開発を続けています。記事の更新方法に合わせて、次の2つの構成があります。</p>
+<h3>GitHubで更新し、Cloudflare Pagesから配信</h3>
+<p>Markdownの記事や画像をGitHubで管理し、pushするとCloudflare Pagesで生成・公開します。<br>
+OSS版と同じようにGitHubで更新しながら、公開先にCloudflareを使う構成です。</p>
+<ul>
+<li><a href="https://markdown-cms-git.pages.dev/">Cloudflare版：GitHub更新型のサイトを見る</a></li>
+<li><a href="https://markdown-cms-git.pages.dev/#/post/sample/github-cloudflare-guide">GitHub更新型の紹介記事を読む</a></li>
+</ul>
+<h3>R2で更新し、Cloudflare Workersから配信</h3>
+<p>Markdownの記事や画像をCloudflare R2へ保存すると、Cloudflare内で公開用のデータを生成し、サイトへ反映します。<br>
+日々の記事更新のために、GitHubアカウントやリポジトリを用意する必要はありません。</p>
+<p>初回のCloudflare設定と認証を済ませたうえで、管理画面や接続を設定したAI・対応ツールから記事を追加・修正する使い方です。</p>
+<ul>
+<li><a href="https://markdown-cms-r2.oosawak.workers.dev/">Cloudflare版：R2更新型のサイトを見る</a></li>
+<li><a href="https://markdown-cms-r2.oosawak.workers.dev/#/post/sample/cloudflare-r2-development">R2版の詳しい紹介を読む</a></li>
+</ul>
+<h2>Cloudflare版を使ってみたい方へ</h2>
+<p>Cloudflare版のご利用や導入、デザインについてご興味のある方は、お気軽にご連絡ください。<br>
+作りたいサイトや記事の更新方法を伺いながら、ご相談できればと思います。</p>
+<p><strong>お問い合わせ：<a href="mailto:oosawak@lyre3.com">oosawak@lyre3.com</a></strong></p>
+<p>Cloudflare版は開発中の商用版です。提供内容や料金・条件については、お問い合わせの際にご相談ください。</p>
+</article>
+
+<p><a href="https://oosawak.github.io/markdown-cms-oss/#/post/sample/oss-and-cloudflare">サイトでこの記事を開く</a></p>
+</main></body></html>

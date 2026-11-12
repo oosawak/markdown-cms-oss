@@ -1,0 +1,110 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AIと相談しながら、サイトのデザインを育てる | MarkdownCMS OSS版</title>
+<meta name="description" content="Refero StylesのページURLをAIに渡し、テンプレートの切り替え、配布版の設定、見出しの改行、案内板のアニメーションまで。このサイトを作る実際のやり取りを紹介します。">
+<link rel="canonical" href="https://oosawak.github.io/markdown-cms-oss/posts/design-conversation.html">
+<meta property="og:type" content="article"><meta property="og:site_name" content="MarkdownCMS OSS版">
+<meta property="og:title" content="AIと相談しながら、サイトのデザインを育てる">
+<meta property="og:description" content="Refero StylesのページURLをAIに渡し、テンプレートの切り替え、配布版の設定、見出しの改行、案内板のアニメーションまで。このサイトを作る実際のやり取りを紹介します。">
+<meta property="og:url" content="https://oosawak.github.io/markdown-cms-oss/posts/design-conversation.html">
+<meta property="og:image" content="https://oosawak.github.io/markdown-cms-oss/og/design-conversation.webp">
+<meta name="twitter:card" content="summary_large_image">
+<style>body{font-family:system-ui,-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;margin:0;background:#f8f7f1;color:#2b2620}main{max-width:760px;margin:0 auto;padding:20px 16px 48px}img.cover{width:100%;height:auto;border-radius:12px}h1{font-size:26px;line-height:1.4;margin:16px 0 6px}.meta{color:#8a7a63;font-size:13px}article{line-height:1.9;font-size:16px}article img{max-width:100%;height:auto}a{color:#8d5b2b}</style>
+</head><body><main>
+<p><a href="https://oosawak.github.io/markdown-cms-oss/">MarkdownCMS OSS版</a></p>
+<img class="cover" src="../og/design-conversation.webp" alt="Markdown CMSのサンプルサイトで使用している写真">
+<h1>AIと相談しながら、サイトのデザインを育てる</h1>
+<p class="meta">2026-10-26 ／ 制作の実例</p>
+<article><p>このサンプルサイトのデザイン切り替えは、最初から細かな仕様を全部決めて作ったものではありません。
+AIに相談し、途中で考え方を修正し、できた画面を見ながら整えてきました。</p>
+<p>その過程そのものが、これからこのOSSで自分のサイトを作る人の参考になりそうです。
+ここでは、実際の会話を要約しながら、どんな伝え方で作業が進んだかを紹介します。</p>
+<h2>出発点は「DESIGN.mdを使えないかな？」</h2>
+<p>最初の相談は、インターネット上のDESIGN.mdを元に見た目を変更できないか、というものでした。
+続いて、URLから取得するだけでなく、テキストの貼り付けや手元のファイルも選べるとよい、という話になりました。</p>
+<p>ここでAIが最初に作ったのは、DESIGN.mdに書かれたYAMLから色・書体・角丸・余白などを取り込む仕組みです。
+これは補助ツールとして使えますが、相談していた「見た目を変える」の範囲を、狭く捉えていました。</p>
+<h2>「似たサイトを作る」と「値を読み込む」は違った</h2>
+<p>利用者が求めていたのは、色の値だけを読み込むことではありません。
+DESIGN.mdを渡してサイトを作るなら、その資料の雰囲気やページ構成も反映したい、ということでした。</p>
+<p>そこで、こんな指摘がありました。</p>
+<blockquote>
+<p>デザインを作るときにDESIGN.mdを渡して、切り替えられるように複数ページのテンプレートを作ったらできそう。</p>
+</blockquote>
+<p>この一言で、方針がはっきりしました。
+DESIGN.mdを元に、AIが記事一覧・記事詳細・サイト紹介のテンプレートを一式作る。
+公開サイトでは、作成済みのテンプレートを同じ記事データに適用して切り替える、という構成です。</p>
+<p>サイトを表示するたびにAIへデザインを依頼する必要はありません。
+制作時にAIが資料を読んで実装し、公開後は普通のHTML・CSS・JavaScriptで表示します。</p>
+<h2>参考資料を渡し、「今のデザインも残して」と伝える</h2>
+<p>実際に利用者がAIへ渡したのは、<a href="https://styles.refero.design/">Refero Styles</a> に掲載されている、各スタイルの紹介ページのURLです。
+DESIGN.mdファイルをダウンロードして添付したり、その本文をコピーして渡したりしたわけではありません。</p>
+<p>「この辺を使っておく？」と渡されたのは、次のページでした。</p>
+<ul>
+<li><a href="https://styles.refero.design/style/a73148b9-449b-42cd-9f38-86ef694f500e">Appleのスタイルページ</a></li>
+<li><a href="https://styles.refero.design/style/2bf4c61f-de10-4614-ba1b-20c0453bd2a9">Notionのスタイルページ</a></li>
+<li><a href="https://styles.refero.design/style/e5f5f8cf-e68d-4ed1-bbf5-6b67569af648">Dalaのスタイルページ</a></li>
+<li><a href="https://styles.refero.design/style/e1f18a7e-5af1-46b3-8f89-bce6c78b80d4">dope.securityのスタイルページ</a></li>
+</ul>
+<p>AIがこれらのページを開いて、掲載されたDESIGN.md形式の資料や配色・書体・余白・部品の説明を読み、このCMSの記事を表示するテンプレートを作りました。
+今回は「デザイン資料のあるページのURLを渡す」という頼み方で進めています。</p>
+<p>その途中で、利用者から大事な条件も伝えられました。</p>
+<blockquote>
+<p>今のデザインも残すようにね。</p>
+</blockquote>
+<p>新しいデザインを作ることと、古いデザインを消すことは別です。
+従来の見た目を「ナチュラル」として残し、追加の4つと比較できるようにしました。</p>
+<p>AIへ変更を頼むときは、「変えたい部分」と一緒に「残してほしい部分」を伝えると、作業の範囲が明確になります。
+例えば、記事データ、URL、検索、言語切り替え、既存のデザインなどです。</p>
+<h2>配布版と公開デモでは、使いたい設定が違う</h2>
+<p>比較用のサンプルには、デザイン切り替えがあると便利です。
+一方、自分の店や個人サイトとして使う人は、一つのデザインで固定したいかもしれません。</p>
+<p>そこで、切り替えをOFFにできるようにしよう、という話になりました。
+さらに、画面上のスイッチでON/OFFするのではなく、設定ファイルで決める方式にしました。</p>
+<pre><code>theme_switcher: false
+template: notion
+</code></pre>
+<p>これで、閲覧者向けの切り替えUIを出さず、Notion風のテンプレートで全ページを表示します。
+以前ブラウザに保存された選択も使わず、設定を優先します。</p>
+<p>最後に「ソースはOFF、デモだけONでよくない？」という整理が入りました。
+現在は、配布ソースの既定値がOFFで、このリポジトリの公開デモだけビルド時にONにしています。
+コピーしたリポジトリでは、自動でONにはなりません。</p>
+<p>「実装できるか」に加えて、「ダウンロードした人はどう使うか」まで伝えると、設定の置き方も変わります。</p>
+<h2>実際に見て、文字の大きさと改行を直す</h2>
+<p>公開してから、Apple風とdope.security風で、次の見出しが大きすぎて不自然に改行されるという指摘がありました。</p>
+<blockquote>
+<p>Markdownで書いて、
+そのまま公開。</p>
+</blockquote>
+<p>原因は、2列レイアウトの中に置く文字なのに、画面全体の幅を基準に大きくしていたことです。
+文字を置く列の幅に合わせてサイズを決め、最大サイズも抑える調整をしました。</p>
+<p>このような修正を頼むときは、「文字が変」だけでなく、どのテンプレートの、どの文章が、どう見えるかを伝えると具体的です。
+使っている画面幅やスクリーンショットがあれば、さらに確認しやすくなります。</p>
+<h2>案内板の「見た目」と「動き」も別だった</h2>
+<p>dope.securityの資料には、空港の案内を思わせる等幅文字や搭乗券風の表現があります。
+その特徴を、記事一覧の「NEWS JOURNAL」と、公開日・カテゴリの案内に取り入れました。</p>
+<p>ただ、最初に追加したのは、文字の枠と中央の区切り線まででした。
+そこで「これがアニメーションしないのはなぜ？」という確認が入りました。</p>
+<p>案内板らしい見た目だけでなく、パタパタと文字が現れる動きも期待されていたわけです。
+その後、見出しを表示するときに、文字の上下が順番にめくれるアニメーションを追加しました。
+端末やブラウザで動きを減らす設定をしている場合は、アニメーションを止めます。</p>
+<p>参考資料を渡す際も、「この文字の形」「この余白」「この動き」のように、特に使いたい特徴を伝えると意図が揃いやすくなります。</p>
+<h2>最初の一回で、全部を決めなくてもよい</h2>
+<p>今回のやり取りでは、最初の依頼だけで完成形が決まったわけではありません。
+途中で意図を確認し、前提を直し、公開されたものを見て調整しています。</p>
+<p>実際に試すなら、例えばこんな順番で進められます。</p>
+<ol>
+<li>サイトの用途と、参考にしたいスタイルページのURLやDESIGN.mdを渡す</li>
+<li>記事一覧・記事詳細・サイト紹介を一式作るよう頼む</li>
+<li>元のデザインや記事など、残してほしいものを伝える</li>
+<li>一つに固定するか、切り替えて比較するかを決める</li>
+<li>PC・スマートフォンの画面を見て、具体的に直したい箇所を伝える</li>
+<li>動きや表示確認についても、実装したこと・確認したことを確かめる</li>
+</ol>
+<p>「自分が欲しかったのは、こういうこと」と途中で伝え直して構いません。
+このサイトでも、そのやり取りによって、単なる色の取り込みから、ページ全体を切り替えられる仕組みへと変わりました。</p>
+<p>自分のサイトで試すための設定と指示例は、<a href="#/post/sample/change-design">サイトのデザインを変えるには</a> にまとめています。
+より詳しい手順は、<a href="https://github.com/oosawak/markdown-cms-oss/blob/main/guides/DESIGN_CUSTOMIZATION.md">デザインを変えるためのガイド</a> と <a href="https://github.com/oosawak/markdown-cms-oss/blob/main/guides/TOOLS.md">必要なツールと動作確認</a> を参照してください。</p>
+</article>
+
+<p><a href="https://oosawak.github.io/markdown-cms-oss/#/post/sample/design-conversation">サイトでこの記事を開く</a></p>
+</main></body></html>
