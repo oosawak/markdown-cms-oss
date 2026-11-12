@@ -355,3 +355,13 @@ html[data-sample-theme="dope"] .grid,html[data-sample-theme="dope"] .article,htm
 html[data-sample-theme="dope"] body,html[data-sample-theme="dope"] .prose{font-family:system-ui, -apple-system, sans-serif;font-size:16px}
 html[data-sample-theme="dope"] .hero h1,html[data-sample-theme="dope"] .articlehead h1{font-family:Georgia, serif}
 html[data-sample-theme="dope"] .sectiontitle h2,html[data-sample-theme="dope"] .cross h2{font-family:ui-monospace, monospace}
+.contact-wrap{max-width:760px}
+.mf-lead{color:var(--muted);font-size:13px}
+.mf-form{margin-top:22px}
+.mf-row{margin-bottom:18px}
+.mf-row label{display:block;font-weight:700;font-size:13px;margin-bottom:6px}
+.mf-row input,.mf-row textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;font:inherit}
+.mf-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.mf-form .cf-turnstile{margin:18px 0}
+.mf-status{margin-top:14px;font-size:13px;color:var(--accent)}
+.mf-privacy{margin-top:20px;font-size:12px}

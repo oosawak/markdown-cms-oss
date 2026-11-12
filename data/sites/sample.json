@@ -22,6 +22,13 @@
     "hero_image": "sample/hero.webp",
     "theme_switcher": false,
     "template": "natural",
+    "contact_form": {
+      "enabled": true,
+      "endpoint": "https://microform.oosawak.workers.dev/submit",
+      "site_id": "sample",
+      "sitekey": "0x4AAAAAAF-NLXBTZZUvCKR-",
+      "privacy_url": ""
+    },
     "i18n": {
       "en": {
         "name": "MarkdownCMS OSS",

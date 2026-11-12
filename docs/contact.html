@@ -1,0 +1,20 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com https://microform.oosawak.workers.dev; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>お問い合わせ | MarkdownCMS OSS版</title><link rel="stylesheet" href="assets/style.css"></head>
+<body><main class="container contact-wrap">
+<p><a class="backlink" href="./">← MarkdownCMS OSS版</a></p>
+<h1>お問い合わせ</h1>
+<p class="mf-lead">MarkdownCMS OSS版へのお問い合わせは、こちらのフォームからどうぞ。内容はメールで運営者へ届きます。</p>
+<form id="microform" class="mf-form paper" method="post" action="#">
+<div class="mf-row"><label for="mf-name">お名前（必須）</label><input id="mf-name" name="name" data-mf-field type="text" maxlength="100" required></div><div class="mf-row"><label for="mf-email">メールアドレス（必須）</label><input id="mf-email" name="email" data-mf-field type="email" maxlength="254" required></div><div class="mf-row"><label for="mf-subject">件名</label><input id="mf-subject" name="subject" data-mf-field type="text" maxlength="200"></div><div class="mf-row"><label for="mf-message">本文（必須）</label><textarea id="mf-message" name="message" data-mf-field rows="8" maxlength="5000" required></textarea></div>
+<div class="mf-hp" aria-hidden="true"><label>この欄は入力しないでください<input type="text" name="hp" tabindex="-1" autocomplete="off"></label></div>
+<div class="cf-turnstile" data-sitekey="0x4AAAAAAF-NLXBTZZUvCKR-"></div>
+<button type="submit" class="pillbutton">送信する</button>
+<p class="mf-status" role="status"></p>
+</form>
+
+</main>
+<script type="application/json" id="microform-config">{"endpoint": "https://microform.oosawak.workers.dev/submit", "siteId": "sample", "sitekey": "0x4AAAAAAF-NLXBTZZUvCKR-"}</script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="assets/microform.js" defer></script>
+</body></html>
