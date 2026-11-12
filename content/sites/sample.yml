@@ -18,10 +18,10 @@ template: natural
 
 # お問い合わせフォーム（microForm）。有効にすると contact.html が生成され、
 # サイトのフッターに「お問い合わせ」リンクが出ます。
-# endpoint は自分の microForm Worker の URL に、sitekey は自分の Turnstile の
-# サイトキーに差し替えてください（下の sitekey は Cloudflare 公式のテストキーで、
-# 常に通過するダミーです）。宛先メールアドレスはここには書かず、Worker 側の
-# サイト登録で決めます。
+# endpoint は自分の microForm Worker の URL に差し替えてください。
+# sitekey は自分の Turnstile のサイトキーを入れてください（サイトキーは
+# 公開情報です。シークレットキーはここには書かず、Worker の secret に入れます）。
+# 宛先メールアドレスはここには書かず、Worker 側のサイト登録で決めます。
 contact_form:
   enabled: true
   endpoint: https://microform.example.workers.dev/submit
