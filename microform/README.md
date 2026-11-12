@@ -140,6 +140,12 @@ contact_form:
 有効にすると、ビルドで `contact.html` が生成され、フッターにリンクが出て、
 ページの CSP の `connect-src` に Worker の Origin が（フォーム有効時のみ）足されます。
 
+生成された `contact.html` の実物は、このリポジトリの
+[docs/contact.html](https://github.com/oosawak/markdown-cms-oss/blob/main/docs/contact.html)
+で見られます。公開デモは
+https://oosawak.github.io/markdown-cms-oss/contact.html
+です。
+
 ## 動作確認
 
 デプロイ直後は、Worker のトップで生存確認ができます。
