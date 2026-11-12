@@ -15,3 +15,16 @@ about: GitHub Actionsで生成し、GitHub Pagesから配信するOSS版のサ�
 hero_image: sample/hero.webp
 theme_switcher: false
 template: natural
+
+# お問い合わせフォーム（microForm）。有効にすると contact.html が生成され、
+# サイトのフッターに「お問い合わせ」リンクが出ます。
+# endpoint は自分の microForm Worker の URL に、sitekey は自分の Turnstile の
+# サイトキーに差し替えてください（下の sitekey は Cloudflare 公式のテストキーで、
+# 常に通過するダミーです）。宛先メールアドレスはここには書かず、Worker 側の
+# サイト登録で決めます。
+contact_form:
+  enabled: true
+  endpoint: https://microform.example.workers.dev/submit
+  site_id: sample
+  sitekey: 1x00000000000000000000AA
+  privacy_url: ''

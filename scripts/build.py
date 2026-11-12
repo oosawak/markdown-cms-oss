@@ -116,6 +116,83 @@ def embed_style_rules():
         rules.append(f'.{cls}{{width:{pct}%;aspect-ratio:{w} / {h}}}')
     return '\n'.join(rules)+'\n'
 
+def contact_form_settings(site):
+    cf=site.get('contact_form')
+    if cf is None:return None
+    if not isinstance(cf,dict):raise ValueError('contact_form must be a mapping')
+    if not cf.get('enabled'):return None
+    for key in ('endpoint','site_id','sitekey'):
+        if not cf.get(key):raise ValueError(f'contact_form.{key} is required when contact_form.enabled is true')
+    endpoint=str(cf['endpoint']).strip()
+    if not endpoint.startswith('https://'):raise ValueError('contact_form.endpoint must be an HTTPS URL')
+    return {'endpoint':endpoint,'site_id':str(cf['site_id']),'sitekey':str(cf['sitekey']),'privacy_url':str(cf.get('privacy_url','') or '')}
+
+def worker_origin(endpoint):
+    return '/'.join(endpoint.split('/')[:3])
+
+# The form fields mirror the microForm Worker's base set (name/email/subject/message).
+CONTACT_FIELDS=[
+    {'name':'name','label':'お名前','type':'text','required':True,'max':100},
+    {'name':'email','label':'メールアドレス','type':'email','required':True,'max':254},
+    {'name':'subject','label':'件名','type':'text','required':False,'max':200},
+    {'name':'message','label':'本文','type':'textarea','required':True,'max':5000},
+]
+
+def contact_field_html(f):
+    req=' required' if f['required'] else ''
+    mark='（必須）' if f['required'] else ''
+    if f['type']=='textarea':
+        control=f'<textarea id="mf-{f["name"]}" name="{f["name"]}" data-mf-field rows="8" maxlength="{f["max"]}"{req}></textarea>'
+    else:
+        control=f'<input id="mf-{f["name"]}" name="{f["name"]}" data-mf-field type="{f["type"]}" maxlength="{f["max"]}"{req}>'
+    return f'<div class="mf-row"><label for="mf-{f["name"]}">{escape(f["label"])}{mark}</label>{control}</div>'
+
+def contact_style_rules():
+    return ('.contact-wrap{max-width:760px}\n'
+      '.mf-lead{color:var(--muted);font-size:13px}\n'
+      '.mf-form{margin-top:22px}\n'
+      '.mf-row{margin-bottom:18px}\n'
+      '.mf-row label{display:block;font-weight:700;font-size:13px;margin-bottom:6px}\n'
+      '.mf-row input,.mf-row textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;font:inherit}\n'
+      '.mf-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}\n'
+      '.mf-form .cf-turnstile{margin:18px 0}\n'
+      '.mf-status{margin-top:14px;font-size:13px;color:var(--accent)}\n'
+      '.mf-privacy{margin-top:20px;font-size:12px}\n')
+
+def contact_page(site,cf):
+    # A standalone form page, like the static article pages. Sending is done
+    # with fetch from assets/microform.js, so form-action stays 'none' and
+    # only connect-src gains the Worker origin (plus Turnstile).
+    origin=worker_origin(cf['endpoint'])
+    csp=("default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self'; img-src 'self' data:; "
+         f"connect-src 'self' https://challenges.cloudflare.com {origin}; frame-src https://challenges.cloudflare.com; "
+         "object-src 'none'; base-uri 'self'; form-action 'none'")
+    fields=''.join(contact_field_html(f) for f in CONTACT_FIELDS)
+    privacy=''
+    if cf['privacy_url']:
+        privacy=f'<p class="mf-privacy"><a href="{escape(cf["privacy_url"],quote=True)}" rel="noopener">個人情報の取り扱いについて</a></p>'
+    config=json.dumps({'endpoint':cf['endpoint'],'siteId':cf['site_id'],'sitekey':cf['sitekey']},ensure_ascii=False).replace('</','<\\/')
+    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="{csp}">
+<title>お問い合わせ | {escape(site['name'])}</title><link rel="stylesheet" href="assets/style.css"></head>
+<body><main class="container contact-wrap">
+<p><a class="backlink" href="./">← {escape(site['name'])}</a></p>
+<h1>お問い合わせ</h1>
+<p class="mf-lead">{escape(site['name'])}へのお問い合わせは、こちらのフォームからどうぞ。内容はメールで運営者へ届きます。</p>
+<form id="microform" class="mf-form paper" method="post" action="#">
+{fields}
+<div class="mf-hp" aria-hidden="true"><label>この欄は入力しないでください<input type="text" name="hp" tabindex="-1" autocomplete="off"></label></div>
+<div class="cf-turnstile" data-sitekey="{escape(cf['sitekey'],quote=True)}"></div>
+<button type="submit" class="pillbutton">送信する</button>
+<p class="mf-status" role="status"></p>
+</form>
+{privacy}
+</main>
+<script type="application/json" id="microform-config">{config}</script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="assets/microform.js" defer></script>
+</body></html>"""
+
 def sanitize_article_html(content):
     return expand_embeds(bleach.clean(content,tags=ALLOWED_MARKDOWN_TAGS,attributes=article_attribute,protocols=['http','https','mailto','data'],strip=True))
 
@@ -289,8 +366,10 @@ def shell(origin=''):
         raise ValueError('PORTAL_URL must be a safe HTTPS URL')
     attrs=f'data-default="{SITE_ID}" data-root="./" data-mode="site" data-site-id="{SITE_ID}" data-portal-url="{escape(portal_url,quote=True)}"'
     attrs+=f' data-template="{template}" data-theme-switcher="{str(switcher).lower()}"'
+    cf=contact_form_settings(settings)
+    connect_src="'self'"+(' '+worker_origin(cf['endpoint']) if cf else '')
     favicon='<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">' if SITE_ID=='sample' else ''
-    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="{escape(site_desc,quote=True)}">{og}<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"><title>{escape(title)}</title>{favicon}<link rel="stylesheet" href="assets/style.css"></head><body><div id="app" {attrs}><p class="loading">読み込み中…</p></div><noscript>JavaScriptを有効にしてください。</noscript><script src="assets/app.js" defer></script></body></html>"""
+    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="{escape(site_desc,quote=True)}">{og}<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src {connect_src}; object-src 'none'; base-uri 'self'; form-action 'none'"><title>{escape(title)}</title>{favicon}<link rel="stylesheet" href="assets/style.css"></head><body><div id="app" {attrs}><p class="loading">読み込み中…</p></div><noscript>JavaScriptを有効にしてください。</noscript><script src="assets/app.js" defer></script></body></html>"""
 
 def generate():
     if DIST.exists():shutil.rmtree(DIST)
@@ -302,6 +381,9 @@ def generate():
     required(site,['id','name','kind','hero_title','description','accent'],cfgpath)
     if site['id']!=SITE_ID:raise ValueError('Site ID mismatch')
     design_settings(site)
+    cf=contact_form_settings(site)
+    if cf:
+        shutil.copy2(ROOT/'assets/microform.js',DIST/'assets/microform.js')
     if site.get('design'):
         design_path=(CONTENT/site['design']).resolve()
         if not design_path.is_relative_to(CONTENT.resolve()):
@@ -318,7 +400,7 @@ def generate():
                 for selectors,body in re.findall(r'([^{}]+)\{([^{}]*)\}',re.sub(r'/\*.*?\*/','',css,flags=re.S)):
                     scoped=','.join(scope if selector.strip()==':root' else scope+' '+selector.strip() for selector in selectors.split(','))
                     output.write(scoped+'{'+body+'}\n')
-    site['i18n']={'en':translated('sites',SITE_ID,{k:v for k,v in site.items() if k not in ('design','template','theme_switcher')})}
+    site['i18n']={'en':translated('sites',SITE_ID,{k:v for k,v in site.items() if k not in ('design','template','theme_switcher','contact_form')})}
     if site.get('hero_image'):
         site['hero_image_src']=image_uri(site['hero_image'],'detail')[0]
         site['hero_thumbnail']={'src':image_uri(site['hero_image'],'thumb')[0], 'alt':site['name'], 'mime':'image/webp'}
@@ -382,14 +464,21 @@ def generate():
         lm=f'<lastmod>{lastmod}</lastmod>' if lastmod else ''
         return f'<url><loc>{escape(loc)}</loc>{lm}</url>'
     sm_lines.append(sm_entry(origin, summaries[0]['date'] if summaries else ''))
+    if cf:
+        sm_lines.append(sm_entry(origin+'contact.html'))
     for s in summaries:
         sm_lines.append(sm_entry(origin+f"posts/{s['slug']}.html", s['date']))
     sm_lines.append('</urlset>')
     (DIST/'sitemap.xml').write_text('\n'.join(sm_lines)+'\n',encoding='utf-8')
     (DIST/'index.html').write_text(shell(origin),encoding='utf-8')
+    if cf:
+        (DIST/'contact.html').write_text(contact_page(site,cf),encoding='utf-8')
     if EMBED_CLASSES:
         with (DIST/'assets/style.css').open('a',encoding='utf-8') as css:
             css.write(embed_style_rules())
+    if cf:
+        with (DIST/'assets/style.css').open('a',encoding='utf-8') as css:
+            css.write(contact_style_rules())
     print(f'Built independent {SITE_ID}: {len(summaries)} items at {origin}')
 
 if __name__=='__main__':generate()

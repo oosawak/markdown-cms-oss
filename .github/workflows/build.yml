@@ -51,6 +51,7 @@ jobs:
           rsync -a --delete dist/data/ docs/data/
           rsync -a --delete dist/assets/ docs/assets/
           cp dist/index.html docs/index.html
+          if [ -f dist/contact.html ]; then cp dist/contact.html docs/contact.html; fi
           rsync -a --delete dist/posts/ docs/posts/
           rsync -a --delete dist/og/ docs/og/
           cp dist/sitemap.xml docs/sitemap.xml
