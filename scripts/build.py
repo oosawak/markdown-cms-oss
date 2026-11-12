@@ -119,6 +119,54 @@ def embed_style_rules():
 def sanitize_article_html(content):
     return expand_embeds(bleach.clean(content,tags=ALLOWED_MARKDOWN_TAGS,attributes=article_attribute,protocols=['http','https','mailto','data'],strip=True))
 
+def save_image_file(rel, out_path, kind='detail'):
+    rel=rel.strip().lstrip('/')
+    filepath=(IMAGES/rel).resolve()
+    if not filepath.is_relative_to(IMAGES.resolve()) or not filepath.exists():
+        raise ValueError(f'Image not found or unsafe: {rel}')
+    with Image.open(filepath) as src:
+        im=ImageOps.exif_transpose(src).convert('RGB')
+        if kind=='thumb':
+            im=ImageOps.fit(im,COLOR_THUMB,method=Image.Resampling.LANCZOS,centering=(.5,.48))
+            quality=74
+        else:
+            im.thumbnail((1540,1540),Image.Resampling.LANCZOS)
+            quality=83
+        out_path.parent.mkdir(parents=True,exist_ok=True)
+        im.save(out_path,format='WEBP',quality=quality,method=5)
+
+def article_page(detail, origin, site_name):
+    # A static, search-engine-readable copy of the article. The interactive
+    # site stays the hash-routed app; this page carries the same text with
+    # per-article title, description and OGP, and links back to the app.
+    title=detail['title']
+    desc=str(detail.get('summary','')).replace('\n',' ')
+    page_url=origin+f"posts/{detail['slug']}.html"
+    og_image=origin+f"og/{detail['slug']}.webp"
+    source=''
+    if detail.get('embed_url'):
+        source=f'<p>元の投稿：<a href="{escape(detail["embed_url"],quote=True)}" rel="noopener" target="_blank">{escape(detail.get("embed_platform",""))}</a></p>'
+    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{escape(title)} | {escape(site_name)}</title>
+<meta name="description" content="{escape(desc,quote=True)}">
+<link rel="canonical" href="{page_url}">
+<meta property="og:type" content="article"><meta property="og:site_name" content="{escape(site_name,quote=True)}">
+<meta property="og:title" content="{escape(title,quote=True)}">
+<meta property="og:description" content="{escape(desc,quote=True)}">
+<meta property="og:url" content="{page_url}">
+<meta property="og:image" content="{og_image}">
+<meta name="twitter:card" content="summary_large_image">
+<style>body{{font-family:system-ui,-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;margin:0;background:#f8f7f1;color:#2b2620}}main{{max-width:760px;margin:0 auto;padding:20px 16px 48px}}img.cover{{width:100%;height:auto;border-radius:12px}}h1{{font-size:26px;line-height:1.4;margin:16px 0 6px}}.meta{{color:#8a7a63;font-size:13px}}article{{line-height:1.9;font-size:16px}}article img{{max-width:100%;height:auto}}a{{color:#8d5b2b}}</style>
+</head><body><main>
+<p><a href="{origin}">{escape(site_name)}</a></p>
+<img class="cover" src="../og/{detail['slug']}.webp" alt="{escape(detail['cover'].get('alt',title),quote=True)}">
+<h1>{escape(title)}</h1>
+<p class="meta">{escape(str(detail.get('date','')))} ／ {escape(str(detail.get('category','')))}</p>
+<article>{detail['html']}</article>
+{source}
+<p><a href="{escape(detail['url'],quote=True)}">サイトでこの記事を開く</a></p>
+</main></body></html>"""
+
 @lru_cache(maxsize=200)
 def image_uri(rel: str, kind: str) -> tuple[str,int]:
     rel=rel.strip().lstrip('/')
@@ -221,18 +269,28 @@ def design_settings(site):
         raise ValueError('Built-in templates and theme_switcher currently require SITE_ID=sample')
     return template,switcher
 
-def shell():
+def shell(origin=''):
     site_titles={'bakery':'haru no tane bakery','town':'みどり野町','fruit':'果実日和','gourmet':'山形グルメ案内'}
     settings=yaml.safe_load((CONTENT/'sites'/f'{SITE_ID}.yml').read_text(encoding='utf-8'))
     template,switcher=design_settings(settings)
     title=site_titles.get(SITE_ID) or settings['name']
+    site_desc=str(settings.get('description','')).replace('\n',' ')
+    og=''
+    if origin:
+        og=(f'<meta property="og:type" content="website"><meta property="og:site_name" content="{escape(title,quote=True)}">'
+            f'<meta property="og:title" content="{escape(title,quote=True)}">'
+            f'<meta property="og:description" content="{escape(site_desc,quote=True)}">'
+            f'<meta property="og:url" content="{origin}">'
+            f'<meta property="og:image" content="{origin}og/hero.webp">'
+            f'<meta name="twitter:card" content="summary_large_image">'
+            f'<link rel="canonical" href="{origin}">')
     portal_url=os.environ.get('PORTAL_URL','').strip()
     if portal_url and (not portal_url.startswith('https://') or '"' in portal_url or '<' in portal_url or '\n' in portal_url):
         raise ValueError('PORTAL_URL must be a safe HTTPS URL')
     attrs=f'data-default="{SITE_ID}" data-root="./" data-mode="site" data-site-id="{SITE_ID}" data-portal-url="{escape(portal_url,quote=True)}"'
     attrs+=f' data-template="{template}" data-theme-switcher="{str(switcher).lower()}"'
     favicon='<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">' if SITE_ID=='sample' else ''
-    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Markdownから生成した静的JSONサイト"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"><title>{escape(title)}</title>{favicon}<link rel="stylesheet" href="assets/style.css"></head><body><div id="app" {attrs}><p class="loading">読み込み中…</p></div><noscript>JavaScriptを有効にしてください。</noscript><script src="assets/app.js" defer></script></body></html>"""
+    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="{escape(site_desc,quote=True)}">{og}<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"><title>{escape(title)}</title>{favicon}<link rel="stylesheet" href="assets/style.css"></head><body><div id="app" {attrs}><p class="loading">読み込み中…</p></div><noscript>JavaScriptを有効にしてください。</noscript><script src="assets/app.js" defer></script></body></html>"""
 
 def generate():
     if DIST.exists():shutil.rmtree(DIST)
@@ -304,6 +362,9 @@ def generate():
         detail={**summary,'cover':{'src':image_uri(fm['cover'],'detail')[0], 'alt':cover_alt,'mime':'image/webp'},
                 'markdown':body,'html':sanitize_article_html(md(body)),'i18n':{'en':english_detail}}
         write_json(DIST/'data/posts'/SITE_ID/f'{slug}.json',detail)
+        save_image_file(fm['cover'], DIST/'og'/f'{slug}.webp')
+        (DIST/'posts').mkdir(parents=True,exist_ok=True)
+        (DIST/'posts'/f'{slug}.html').write_text(article_page(detail, origin, site['name']),encoding='utf-8')
         summaries.append(summary)
     summaries.sort(key=lambda x:(x['date'],x['id']),reverse=True)
     feed={'version':1,'schema':'static-site-feed/v1','schema_version':'1.1.0','languages':['ja','en'],
@@ -314,7 +375,18 @@ def generate():
             'entries':summaries, 'hero_image_src':site.get('hero_image_src','')}
     write_json(DIST/'data/portal.json',portal)
     write_json(DIST/'data/portal-local.json',portal)
-    (DIST/'index.html').write_text(shell(),encoding='utf-8')
+    if site.get('hero_image'):
+        save_image_file(site['hero_image'], DIST/'og/hero.webp')
+    sm_lines=['<?xml version="1.0" encoding="UTF-8"?>','<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    def sm_entry(loc,lastmod=''):
+        lm=f'<lastmod>{lastmod}</lastmod>' if lastmod else ''
+        return f'<url><loc>{escape(loc)}</loc>{lm}</url>'
+    sm_lines.append(sm_entry(origin, summaries[0]['date'] if summaries else ''))
+    for s in summaries:
+        sm_lines.append(sm_entry(origin+f"posts/{s['slug']}.html", s['date']))
+    sm_lines.append('</urlset>')
+    (DIST/'sitemap.xml').write_text('\n'.join(sm_lines)+'\n',encoding='utf-8')
+    (DIST/'index.html').write_text(shell(origin),encoding='utf-8')
     if EMBED_CLASSES:
         with (DIST/'assets/style.css').open('a',encoding='utf-8') as css:
             css.write(embed_style_rules())

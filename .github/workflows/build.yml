@@ -51,6 +51,9 @@ jobs:
           rsync -a --delete dist/data/ docs/data/
           rsync -a --delete dist/assets/ docs/assets/
           cp dist/index.html docs/index.html
+          rsync -a --delete dist/posts/ docs/posts/
+          rsync -a --delete dist/og/ docs/og/
+          cp dist/sitemap.xml docs/sitemap.xml
           cp dist/preview.html preview.html
           cp dist/preview.html docs/preview.html
       - name: Commit generated changes
