@@ -24,7 +24,7 @@ template: natural
 # 宛先メールアドレスはここには書かず、Worker 側のサイト登録で決めます。
 contact_form:
   enabled: true
-  endpoint: https://microform.example.workers.dev/submit
+  endpoint: https://microform.oosawak.workers.dev/submit
   site_id: sample
   sitekey: 0x4AAAAAAF-NLXBTZZUvCKR-
   privacy_url: ''
